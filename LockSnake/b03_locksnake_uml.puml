@@ -1,0 +1,130 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class Main
+
+class GameEngine {
+  - state: GameState
+  - gamePanel: GamePanel
+  + GameEngine(level: Level)
+  + state(): GameState
+  + setGamePanel(panel: GamePanel): void
+  + update(d: Direction): void
+  + tick(): void
+}
+
+class GameState {
+  - level: Level
+  - snake: Snake
+  - pins: List<Pin>
+  - status: Status
+  - pendingDirection: Direction
+  + GameState(level: Level, snake: Snake, pins: List<Pin>, status: Status, pendingDirection: Direction)
+  + level(): Level
+  + snake(): Snake
+  + pins(): List<Pin>
+  + status(): Status
+  + pendingDirection(): Direction
+  + tick(): GameState
+}
+
+enum Status {
+  RUNNING
+  WON
+  LOST_SELF_COLLISION
+  LOST_OUT_OF_BOUNDS
+}
+
+class GamePanel {
+  - state: GameState
+  - renderer: GameRenderer
+  - gameEngine: GameEngine
+  + GamePanel(initialState: GameState, renderer: GameRenderer)
+  + update(newState: GameState): void
+  + setGameEngine(engine: GameEngine): void
+}
+
+interface GameRenderer
+
+class Java2DRenderer
+
+class Level {
+  - width: int
+  - height: int
+  - cells: CellType[][]
+  - pins: List<Pin>
+  - snakeStart: Position
+}
+
+class Snake {
+  - body: List<Position>
+  + head(): Position
+  + body(): List<Position>
+  + nextHead(d: Direction): Position
+  + occupies(position: Position): boolean
+  + grow(d: Direction): Snake
+}
+
+class Pin {
+  - position: Position
+  - state: State
+  - activationDirection: Direction
+}
+
+enum State {
+  LOW
+  HIGH
+}
+
+class Position {
+  - x: int
+  - y: int
+}
+
+enum Direction {
+  UP
+  DOWN
+  LEFT
+  RIGHT
+  NONE
+}
+
+enum CellType {
+  EMPTY
+  WALL
+  PIN_SLOT
+}
+
+class LevelLoader
+
+Main --> LevelLoader : load level
+Main --> GameEngine : creates
+Main --> GamePanel : creates
+
+GameEngine --> GameState : manages
+GameEngine --> GamePanel : update(GameState)
+GamePanel --> GameEngine : update(Direction)
+
+GamePanel --> GameState : displays
+GamePanel --> GameRenderer : uses
+Java2DRenderer ..|> GameRenderer
+
+GameState --> Level
+GameState --> Snake
+GameState --> Direction
+GameState --> "0..*" Pin
+GameState --> Status
+
+GameEngine --> Level
+
+Level --> CellType
+Level --> "0..*" Pin
+Level --> Position : snakeStart
+
+Snake --> "1..*" Position
+Pin --> Position
+Pin --> Direction
+Pin --> State
+
+@enduml
