@@ -13,7 +13,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 public class Main {
-  public static void main() {
+  // Standard-Java-Startmethode fuer das Spiel.
+  public static void main(String... args) {
     SwingUtilities.invokeLater(
         () -> {
           try {
